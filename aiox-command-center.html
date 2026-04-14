@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIOX Command Center — Orion HQ</title>
+<meta name="description" content="Centro de Comando e Wiki do framework AIOX. Dashboard tático para pilotar o Synkra AIOX.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-deep:#06080d;--bg-panel:#0c1018;--bg-card:#111827;--bg-card-hover:#1a2332;
+  --border:#1e293b;--border-glow:#00f0ff22;
+  --cyan:#00f0ff;--cyan-dim:#00f0ff88;--magenta:#ff00aa;--magenta-dim:#ff00aa66;
+  --green:#00ff88;--yellow:#ffd700;--orange:#ff6b35;--red:#ff3366;--purple:#a855f7;
+  --text:#e2e8f0;--text-dim:#94a3b8;--text-muted:#64748b;
+  --font-sans:'Inter',system-ui,sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --glow-cyan:0 0 20px #00f0ff33,0 0 40px #00f0ff11;
+  --glow-magenta:0 0 20px #ff00aa33,0 0 40px #ff00aa11;
+}
+html{scroll-behavior:smooth;font-size:15px}
+body{font-family:var(--font-sans);background:var(--bg-deep);color:var(--text);line-height:1.6;overflow-x:hidden}
+::selection{background:var(--cyan);color:var(--bg-deep)}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg-deep)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--cyan-dim)}
+
+/* ===== HEADER ===== */
+.hero{position:relative;padding:3rem 2rem 2rem;text-align:center;border-bottom:1px solid var(--border);overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,var(--cyan-dim) 0%,transparent 70%);opacity:.15;pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem 1rem;border:1px solid var(--cyan-dim);border-radius:999px;font-size:.75rem;color:var(--cyan);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem;backdrop-filter:blur(8px);background:#00f0ff08}
+.hero h1{font-size:2.5rem;font-weight:900;background:linear-gradient(135deg,var(--cyan),var(--magenta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.02em}
+.hero p{color:var(--text-dim);max-width:600px;margin:.75rem auto 0;font-size:.95rem}
+
+/* ===== NAV ===== */
+.nav{position:sticky;top:0;z-index:100;display:flex;gap:.25rem;padding:.5rem 1rem;background:var(--bg-deep)ee;border-bottom:1px solid var(--border);backdrop-filter:blur(12px);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.nav a{padding:.5rem 1rem;border-radius:8px;color:var(--text-dim);text-decoration:none;font-size:.8rem;font-weight:600;white-space:nowrap;transition:all .2s}
+.nav a:hover,.nav a.active{color:var(--cyan);background:#00f0ff0a}
+.nav a.active{border:1px solid var(--cyan-dim)}
+
+/* ===== SECTIONS ===== */
+.section{padding:3rem 1.5rem;max-width:1200px;margin:0 auto}
+.section-label{display:inline-flex;align-items:center;gap:.5rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--cyan);margin-bottom:.5rem;padding:.25rem .75rem;border:1px solid var(--border);border-radius:4px;background:var(--bg-panel)}
+.section h2{font-size:1.8rem;font-weight:800;margin-bottom:.5rem;color:#fff}
+.section>p.desc{color:var(--text-dim);margin-bottom:2rem;max-width:700px;font-size:.9rem}
+
+/* ===== CARDS ===== */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;transition:all .3s;position:relative;overflow:hidden}
+.card:hover{border-color:var(--cyan-dim);transform:translateY(-2px);box-shadow:var(--glow-cyan)}
+.card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0;transition:opacity .3s}
+.card:hover::after{opacity:1}
+.card h3{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:.5rem}
+.card p{color:var(--text-dim);font-size:.85rem}
+
+/* ===== GRID LAYOUTS ===== */
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1rem}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+
+/* ===== ORION SECTION ===== */
+.orion-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:768px){.orion-grid{grid-template-columns:1fr}}
+.orion-avatar{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+.orion-avatar .icon{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--cyan),var(--magenta));display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:var(--glow-cyan)}
+.orion-avatar h3{font-size:1.3rem}
+.orion-avatar .subtitle{color:var(--cyan);font-size:.8rem;font-weight:600}
+.principle{display:flex;gap:.75rem;padding:.75rem 0;border-bottom:1px solid #1e293b44}
+.principle:last-child{border:none}
+.principle .num{color:var(--cyan);font-family:var(--font-mono);font-weight:700;font-size:.8rem;min-width:24px;padding-top:2px}
+.principle .text{font-size:.85rem;color:var(--text-dim)}
+.principle .text strong{color:var(--text)}
+
+/* ===== AGENT CARDS ===== */
+.agent-card{cursor:pointer}
+.agent-card .agent-header{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem}
+.agent-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.agent-meta h3{font-size:1rem;margin-bottom:0}
+.agent-meta .agent-role{font-size:.75rem;color:var(--text-muted)}
+.agent-tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.75rem}
+.tag{padding:.15rem .5rem;border-radius:4px;font-size:.65rem;font-weight:600;background:#ffffff08;color:var(--text-muted);border:1px solid #ffffff0a}
+.agent-detail{display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)}
+.agent-card.expanded .agent-detail{display:block}
+.cmd-list{list-style:none;padding:0}
+.cmd-list li{padding:.35rem 0;font-size:.8rem;display:flex;gap:.5rem;border-bottom:1px solid #ffffff06}
+.cmd-list li:last-child{border:none}
+.cmd-list code{font-family:var(--font-mono);color:var(--cyan);background:#00f0ff08;padding:.1rem .4rem;border-radius:3px;font-size:.75rem;white-space:nowrap}
+.cmd-list .cmd-desc{color:var(--text-dim)}
+
+/* ===== COMMAND TERMINAL ===== */
+.terminal{background:#0a0e14;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.terminal-bar{display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;background:#0f1319;border-bottom:1px solid var(--border)}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-dot.r{background:#ff5f57}.terminal-dot.y{background:#febc2e}.terminal-dot.g{background:#28c840}
+.terminal-title{margin-left:.5rem;font-size:.75rem;color:var(--text-muted);font-family:var(--font-mono)}
+.terminal-body{padding:1rem 1.25rem;max-height:600px;overflow-y:auto}
+.cmd-category{margin-bottom:1.5rem}
+.cmd-category h4{color:var(--magenta);font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem;padding-bottom:.35rem;border-bottom:1px solid #ffffff0a;display:flex;align-items:center;gap:.5rem}
+.cmd-row{display:grid;grid-template-columns:260px 1fr;gap:.75rem;padding:.4rem 0;font-size:.8rem;border-bottom:1px solid #ffffff04}
+.cmd-row:last-child{border:none}
+.cmd-row code{font-family:var(--font-mono);color:var(--green);font-size:.78rem}
+.cmd-row .exp{color:var(--text-dim);font-size:.78rem}
+.cmd-filter{width:100%;padding:.6rem 1rem;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-mono);font-size:.85rem;margin-bottom:1.25rem;outline:none;transition:border-color .2s}
+.cmd-filter:focus{border-color:var(--cyan)}
+
+/* ===== ENGINES ===== */
+.engine-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.engine-box h3{display:flex;align-items:center;gap:.5rem;font-size:1.1rem;margin-bottom:.75rem;color:#fff}
+.flow-step{display:flex;align-items:flex-start;gap:.75rem;padding:.5rem 0}
+.flow-step .step-num{min-width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0}
+.flow-step .step-text{font-size:.85rem;color:var(--text-dim)}
+.flow-step .step-text strong{color:var(--text)}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.75rem;margin-top:1rem}
+.gate{padding:1rem;border-radius:8px;border:1px solid var(--border);background:var(--bg-panel);text-align:center}
+.gate .gate-cmd{font-family:var(--font-mono);font-size:.8rem;color:var(--green);margin-top:.35rem}
+.gate .gate-severity{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-top:.35rem;padding:.15rem .5rem;border-radius:3px;display:inline-block}
+.sev-block{background:#ff336622;color:var(--red)}
+.sev-warn{background:#ffd70022;color:var(--yellow)}
+
+/* ===== WORKFLOW CHAIN ===== */
+.chain{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:1.5rem 0}
+.chain-step{display:flex;align-items:center;gap:.35rem;padding:.4rem .8rem;border-radius:8px;border:1px solid var(--border);background:var(--bg-panel);font-size:.78rem;font-weight:600}
+.chain-arrow{color:var(--cyan);font-size:1.2rem}
+
+/* ===== FOOTER ===== */
+.footer{text-align:center;padding:2rem;border-top:1px solid var(--border);color:var(--text-muted);font-size:.75rem}
+.footer .sig{color:var(--cyan);font-weight:600}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:600px){
+  .hero h1{font-size:1.7rem}
+  .cmd-row{grid-template-columns:1fr;gap:.2rem}
+  .section{padding:2rem 1rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+  <div class="hero-badge">👑 Synkra AIOX Framework v5.0</div>
+  <h1>AIOX Command Center</h1>
+  <p>Manual tático para pilotar o framework AIOX. Conheça os agentes, domine os comandos, entenda os motores internos.</p>
+</header>
+
+<!-- ===== NAV ===== -->
+<nav class="nav" id="mainNav">
+  <a href="#orion" class="active">👑 Orion</a>
+  <a href="#squad">🎖️ Squad</a>
+  <a href="#commands">⌨️ Comandos</a>
+  <a href="#engines">⚙️ Motores</a>
+  <a href="#workflows">🔄 Workflows</a>
+</nav>
+
+<!-- ===== 1. ORION ===== -->
+<section class="section" id="orion">
+  <span class="section-label">01 — Identidade</span>
+  <h2>Quem é o Orion?</h2>
+  <p class="desc">Orion é o Master Orchestrator do AIOX — a inteligência central que coordena todos os sub-agentes, gerencia o estado da sessão e toma decisões sobre delegação.</p>
+
+  <div class="orion-grid">
+    <div class="card">
+      <div class="orion-avatar">
+        <div class="icon">👑</div>
+        <div><h3>Orion</h3><div class="subtitle">Master Orchestrator & Framework Developer</div></div>
+      </div>
+      <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:1rem">Executor universal de todas as capacidades do Synkra AIOX. Cria componentes do framework, orquestra workflows e executa qualquer task diretamente.</p>
+      <div class="principle"><span class="num">01</span><span class="text"><strong>Execução Direta</strong> — Pode executar qualquer recurso de qualquer agente sem transformação de persona.</span></div>
+      <div class="principle"><span class="num">02</span><span class="text"><strong>Lazy Loading</strong> — Carrega recursos apenas em runtime, nunca pré-carrega.</span></div>
+      <div class="principle"><span class="num">03</span><span class="text"><strong>IDS Governance</strong> — Antes de criar, consulta o registry para REUSE/ADAPT/CREATE.</span></div>
+      <div class="principle"><span class="num">04</span><span class="text"><strong>Handoff Inteligente</strong> — Delega para agentes especializados quando a tarefa exige expertise específica.</span></div>
+      <div class="principle"><span class="num">05</span><span class="text"><strong>Security First</strong> — Valida todo código gerado e requer confirmação para operações sensíveis.</span></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:1rem">🧠 Como Orion Toma Decisões</h3>
+      <div class="principle"><span class="num">→</span><span class="text"><strong>Request Resolution:</strong> Mapeia pedidos do usuário flexivelmente para comandos e dependências. Ex: "crie uma story" → <code>*create-next-story</code></span></div>
+      <div class="principle"><span class="num">→</span><span class="text"><strong>Agent Authority:</strong> Respeita autoridades exclusivas. Apenas @devops faz push, apenas @architect decide arquitetura, apenas @qa emite verdicts.</span></div>
+      <div class="principle"><span class="num">→</span><span class="text"><strong>Handoff Artifacts:</strong> Ao concluir um passo, gera YAML em <code>.aiox/handoffs/</code> para o próximo agente, com <code>consumed: false</code>.</span></div>
+      <div class="principle"><span class="num">→</span><span class="text"><strong>Session State:</strong> Rastreia em <code>.aiox/session-state.json</code> o agente ativo, workflow corrente, phase e story atual.</span></div>
+      <div class="principle"><span class="num">→</span><span class="text"><strong>Workflow State:</strong> Para cada workflow, cria <code>.aiox/{id}-state.yaml</code> com steps, artifacts e decisions.</span></div>
+      <div class="principle"><span class="num">→</span><span class="text"><strong>Permission Modes:</strong> Cicla entre <code>⚠️ Ask</code> (pede confirmação), <code>🟢 Auto</code> (executa sozinho) e <code>🔍 Explore</code> (apenas analisa).</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 2. SQUAD ===== -->
+<section class="section" id="squad">
+  <span class="section-label">02 — Topologia</span>
+  <h2>O Squad AIOX</h2>
+  <p class="desc">12 agentes especializados, cada um com persona, comandos e autoridades exclusivas. Clique para expandir.</p>
+
+  <div class="grid-3" id="agentGrid">
+    <!-- Agents inserted by JS -->
+  </div>
+</section>
+
+<!-- ===== 3. COMMANDS ===== -->
+<section class="section" id="commands">
+  <span class="section-label">03 — Terminal</span>
+  <h2>Cheat Sheet de Comandos</h2>
+  <p class="desc">Todos os comandos disponíveis no AIOX. Use o prefixo <code>*</code> antes de cada comando no chat. Filtre para encontrar rapidamente.</p>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <span class="terminal-dot r"></span><span class="terminal-dot y"></span><span class="terminal-dot g"></span>
+      <span class="terminal-title">aiox-master@orion ~</span>
+    </div>
+    <div class="terminal-body">
+      <input type="text" class="cmd-filter" id="cmdFilter" placeholder="🔍 Filtrar comandos... (ex: ids, create, push, review)">
+      <div id="cmdList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 4. ENGINES ===== -->
+<section class="section" id="engines">
+  <span class="section-label">04 — Motores Internos</span>
+  <h2>IDS & Quality Gates</h2>
+  <p class="desc">Os dois motores que governam a criação e a qualidade no AIOX.</p>
+
+  <div class="engine-box">
+    <h3>🔄 IDS — Incremental Decision System</h3>
+    <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:1rem">Antes de criar qualquer componente, o IDS consulta o Entity Registry (<code>entity-registry.yaml</code>, 521KB) para evitar duplicação e promover reutilização.</p>
+    <div class="flow-step"><span class="step-num">1</span><span class="step-text"><strong>*ids check {intent}</strong> — Consulta o registry. Retorna recomendação: <span style="color:var(--green)">REUSE</span> (já existe), <span style="color:var(--yellow)">ADAPT</span> (forka e modifica) ou <span style="color:var(--cyan)">CREATE</span> (novo).</span></div>
+    <div class="flow-step"><span class="step-num">2</span><span class="step-text"><strong>*ids impact {id}</strong> — Análise de impacto via BFS traversal. Mostra consumidores diretos e indiretos.</span></div>
+    <div class="flow-step"><span class="step-num">3</span><span class="step-text"><strong>*ids register {path}</strong> — Registra nova entidade no registry. Automático após <code>*create</code>.</span></div>
+    <div class="flow-step"><span class="step-num">4</span><span class="step-text"><strong>*ids health</strong> — Health check do registry. Verifica integridade, referências quebradas.</span></div>
+    <div class="flow-step"><span class="step-num">5</span><span class="step-text"><strong>*ids stats</strong> — Estatísticas: contagem por tipo, categorias, health score geral.</span></div>
+    <p style="font-size:.8rem;color:var(--text-muted);margin-top:.75rem">⚠️ O IDS é <strong>advisory</strong> (não-bloqueante) — recomenda mas não impede. Os hooks rodam automaticamente antes de <code>*create</code> e <code>*modify</code>.</p>
+  </div>
+
+  <div class="engine-box">
+    <h3>🛡️ Quality Gates — Constitution v1.0</h3>
+    <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:1rem">6 princípios fundamentais da Constitution. Violações de NON-NEGOTIABLE e MUST são bloqueadas automaticamente via gates.</p>
+    <div class="gate-grid">
+      <div class="gate"><strong>Lint</strong><div class="gate-cmd">npm run lint</div><div class="gate-severity sev-block">BLOCK</div></div>
+      <div class="gate"><strong>TypeCheck</strong><div class="gate-cmd">npm run typecheck</div><div class="gate-severity sev-block">BLOCK</div></div>
+      <div class="gate"><strong>Tests</strong><div class="gate-cmd">npm run test</div><div class="gate-severity sev-block">BLOCK</div></div>
+      <div class="gate"><strong>Build</strong><div class="gate-cmd">npm run build</div><div class="gate-severity sev-block">BLOCK</div></div>
+      <div class="gate"><strong>CodeRabbit</strong><div class="gate-cmd">coderabbit --prompt-only</div><div class="gate-severity sev-block">CRITICAL</div></div>
+      <div class="gate"><strong>Story Status</strong><div class="gate-cmd">Done / Ready for Review</div><div class="gate-severity sev-warn">WARN</div></div>
+    </div>
+    <div style="margin-top:1.25rem">
+      <p style="font-size:.8rem;color:var(--text-muted)"><strong>Severidades:</strong> <span style="color:var(--red)">BLOCK</span> impede execução. <span style="color:var(--yellow)">WARN</span> permite com alerta. <span style="color:var(--text-dim)">INFO</span> apenas reporta.</p>
+    </div>
+  </div>
+
+  <div class="engine-box">
+    <h3>📜 Constitution — 6 Princípios</h3>
+    <div class="flow-step"><span class="step-num">I</span><span class="step-text"><strong>CLI First (NON-NEGOTIABLE)</strong> — Toda funcionalidade funciona 100% via CLI antes de qualquer UI.</span></div>
+    <div class="flow-step"><span class="step-num">II</span><span class="step-text"><strong>Agent Authority (NON-NEGOTIABLE)</strong> — Cada agente tem autoridades exclusivas invioláveis.</span></div>
+    <div class="flow-step"><span class="step-num">III</span><span class="step-text"><strong>Story-Driven Dev (MUST)</strong> — Nenhum código é escrito sem uma story associada.</span></div>
+    <div class="flow-step"><span class="step-num">IV</span><span class="step-text"><strong>No Invention (MUST)</strong> — Specs derivam dos requisitos, nunca inventam.</span></div>
+    <div class="flow-step"><span class="step-num">V</span><span class="step-text"><strong>Quality First (MUST)</strong> — Todo código passa por múltiplos gates antes de merge.</span></div>
+    <div class="flow-step"><span class="step-num">VI</span><span class="step-text"><strong>Absolute Imports (SHOULD)</strong> — Sempre usar imports com alias <code>@/</code>.</span></div>
+  </div>
+</section>
+
+<!-- ===== 5. WORKFLOWS ===== -->
+<section class="section" id="workflows">
+  <span class="section-label">05 — Fluxos</span>
+  <h2>Workflow Chains</h2>
+  <p class="desc">Os 4 workflows pré-definidos que encadeiam agentes em sequência. O Orion gerencia transições via handoff artifacts.</p>
+
+  <div class="engine-box">
+    <h3>🔗 Story Development Cycle (SDC)</h3>
+    <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:1rem">Workflow primário — 5 fases para todo trabalho de desenvolvimento.</p>
+    <div class="chain">
+      <span class="chain-step">🌊 @sm *draft</span><span class="chain-arrow">→</span>
+      <span class="chain-step">🎯 @po *validate</span><span class="chain-arrow">→</span>
+      <span class="chain-step">💻 @dev *develop</span><span class="chain-arrow">→</span>
+      <span class="chain-step">✅ @qa *review</span><span class="chain-arrow">→</span>
+      <span class="chain-step">⚡ @devops *push</span>
+    </div>
+  </div>
+
+  <div class="engine-box">
+    <h3>🔗 Spec Pipeline</h3>
+    <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:1rem">Transforma requisitos informais em specs executáveis.</p>
+    <div class="chain">
+      <span class="chain-step">📋 @pm *gather</span><span class="chain-arrow">→</span>
+      <span class="chain-step">🏛️ @architect *analyze</span><span class="chain-arrow">→</span>
+      <span class="chain-step">🔍 @analyst *research</span><span class="chain-arrow">→</span>
+      <span class="chain-step">📋 @pm *write-spec</span><span class="chain-arrow">→</span>
+      <span class="chain-step">✅ @qa *critique</span><span class="chain-arrow">→</span>
+      <span class="chain-step">🏛️ @architect *plan</span>
+    </div>
+  </div>
+
+  <div class="engine-box">
+    <h3>🔗 Greenfield Fullstack (4 fases)</h3>
+    <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:1rem">Projeto do zero — do bootstrap ao deploy.</p>
+    <div class="chain">
+      <span class="chain-step" style="border-color:var(--red)">⚡ Phase 0: Bootstrap</span><span class="chain-arrow">→</span>
+      <span class="chain-step" style="border-color:var(--yellow)">📊🏛️📋🎨 Phase 1: Discovery</span><span class="chain-arrow">→</span>
+      <span class="chain-step" style="border-color:var(--cyan)">🎯 Phase 2: Shard</span><span class="chain-arrow">→</span>
+      <span class="chain-step" style="border-color:var(--green)">🌊💻✅⚡ Phase 3: Dev Cycle</span>
+    </div>
+  </div>
+
+  <div class="engine-box">
+    <h3>🔗 Brownfield Discovery (5 fases)</h3>
+    <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:1rem">Avaliação de dívida técnica em projetos existentes.</p>
+    <div class="chain">
+      <span class="chain-step">🏛️ @architect analyze</span><span class="chain-arrow">→</span>
+      <span class="chain-step">📊 @data-engineer audit</span><span class="chain-arrow">→</span>
+      <span class="chain-step">🎨 @ux audit</span><span class="chain-arrow">→</span>
+      <span class="chain-step">✅ @qa review</span><span class="chain-arrow">→</span>
+      <span class="chain-step">📋 @pm create-epic</span>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>AIOX Command Center — Built for educational purposes</p>
+  <p class="sig">— Orion, orquestrando o sistema 🎯</p>
+</footer>
+
+<script>
+// ===== AGENT DATA =====
+const agents = [
+  {id:'aiox-master',name:'Orion',icon:'👑',color:'#ffd700',role:'Master Orchestrator & Framework Developer',archetype:'Orchestrator ♌',desc:'Executor universal. Cria componentes do framework, orquestra workflows, executa qualquer task diretamente.',cmds:['*help','*status','*kb — Toggle Knowledge Base','*create agent|task|workflow','*modify agent|task','*validate-component','*task {name}','*workflow {name}','*plan [create|status]','*create-doc {template}','*shard-doc {doc}','*ids check|impact|register|health|stats','*sync-registry-intel','*execute-checklist {name}','*guide','*yolo — Cicla modo permissão'],tags:['Framework Dev','Orchestration','IDS','Meta-Agent']},
+  {id:'architect',name:'Aria',icon:'🏛️',color:'#4ecdc4',role:'Holistic System Architect & Full-Stack Tech Leader',archetype:'Visionary ♐',desc:'Mestre de design holístico. Ponte entre frontend, backend e infra. Decisões de arquitetura são exclusivas deste agente.',cmds:['*create-full-stack-architecture','*create-backend-architecture','*create-front-end-architecture','*create-brownfield-architecture','*analyze-project-structure','*document-project','*research {topic}','*validate-tech-preset {name}','*assess-complexity','*create-plan','*map-codebase'],tags:['Architecture','Tech Stack','API Design','Security']},
+  {id:'dev',name:'Dex',icon:'💻',color:'#45b7d1',role:'Expert Senior Software Engineer',archetype:'Builder ♒',desc:'Implementador de stories. Lê requisitos, executa tasks sequencialmente, roda testes. Pode commitar mas NÃO pode dar push.',cmds:['*develop {story-id}','*develop-yolo — Modo autônomo','*execute-subtask','*verify-subtask','*build-autonomous {story-id}','*build-resume {story-id}','*build-status','*apply-qa-fixes','*run-tests','*create-service','*waves — Análise paralelismo','*gotcha {title}','*worktree-create {id}'],tags:['Implementation','Testing','Build','Worktree']},
+  {id:'qa',name:'Quinn',icon:'✅',color:'#22c55e',role:'Test Architect & Quality Advisor',archetype:'Guardian ♍',desc:'Guardião da qualidade. Review com 10 fases, gate decisions (PASS/CONCERNS/FAIL/WAIVED), security checks.',cmds:['*review {story}','*review-build {story} — 10 fases','*gate {story}','*code-review {scope}','*nfr-assess {story}','*risk-profile {story}','*security-check {story}','*validate-libraries','*validate-migrations','*test-design {story}','*trace {story}','*create-suite','*critique-spec','*console-check'],tags:['Quality Gate','Security','Test Design','CodeRabbit']},
+  {id:'pm',name:'Morgan',icon:'📋',color:'#8b5cf6',role:'Investigative Product Strategist',archetype:'Strategist ♑',desc:'Cria PRDs, define epics, planeja produto. Usa templates para documentação estruturada.',cmds:['*create-prd','*create-brownfield-prd','*create-epic','*create-story','*execute-epic {path}','*research {topic}','*gather-requirements','*write-spec','*shard-prd','*toggle-profile'],tags:['PRD','Epic','Product Strategy','Spec Pipeline']},
+  {id:'devops',name:'Gage',icon:'⚡',color:'#ff6b35',role:'GitHub Repository Guardian & Release Manager',archetype:'Operator ♈',desc:'ÚNICO agente autorizado a fazer push, criar PRs e releases. Executa quality gates antes de qualquer operação remota.',cmds:['*environment-bootstrap','*push','*pre-push','*create-pr','*release','*version-check','*configure-ci','*cleanup','*triage-issues','*resolve-issue {n}','*health-check','*sync-registry','*setup-github','*setup-mcp-docker','*add-mcp','*search-mcp'],tags:['Git Push (EXCLUSIVE)','CI/CD','Release','MCP']},
+  {id:'data-engineer',name:'Dara',icon:'📊',color:'#06b6d4',role:'Master Database Architect & Reliability Engineer',archetype:'Sage ♊',desc:'Guardião da integridade de dados. Schema design, migrations, RLS, query optimization, Supabase expert.',cmds:['*create-schema','*create-rls-policies','*model-domain','*setup-database','*bootstrap','*apply-migration {path}','*dry-run {path}','*snapshot {label}','*rollback {snapshot}','*security-audit {scope}','*analyze-performance {type}','*policy-apply {table} {mode}','*test-as-user {id}','*smoke-test','*load-csv','*run-sql'],tags:['PostgreSQL','RLS','Migrations','Supabase']},
+  {id:'analyst',name:'Atlas',icon:'🔍',color:'#ec4899',role:'Insightful Analyst & Strategic Ideation Partner',archetype:'Decoder ♏',desc:'Research, brainstorming, análise competitiva. Gera project briefs e insights acionáveis para o PM.',cmds:['*create-project-brief','*perform-market-research','*create-competitor-analysis','*brainstorm {topic}','*research-prompt {topic}','*elicit','*extract-patterns'],tags:['Research','Brainstorming','Market Analysis']},
+  {id:'sm',name:'River',icon:'🌊',color:'#14b8a6',role:'Technical Scrum Master — Story Specialist',archetype:'Facilitator ♓',desc:'Cria stories detalhadas a partir do PRD. Gerencia branches locais. Não implementa código NUNCA.',cmds:['*draft — Cria próxima story','*story-checklist'],tags:['Story Creation','Sprint','Branches Locais']},
+  {id:'po',name:'Pax',icon:'🎯',color:'#f59e0b',role:'Technical Product Owner & Process Steward',archetype:'Balancer ♎',desc:'Valida artefatos, gerencia backlog, fecha stories. Guardião da coesão entre documentos.',cmds:['*validate-story-draft {story}','*close-story {story}','*backlog-add','*backlog-review','*backlog-prioritize','*stories-index','*shard-doc {doc}','*sync-story','*pull-story','*execute-checklist-po'],tags:['Backlog','Validation','Story Lifecycle']},
+  {id:'ux-design-expert',name:'Uma',icon:'🎨',color:'#e879f9',role:'UX/UI Designer & Design System Architect',archetype:'Empathizer ♋',desc:'5 fases: Research → Audit → Tokens → Build → Quality. Combina empatia de UX com sistemas de Brad Frost.',cmds:['*research — User research','*wireframe {fidelity}','*generate-ui-prompt','*create-front-end-spec','*audit {path}','*consolidate','*shock-report','*tokenize','*setup','*migrate','*build {component}','*compose {molecule}','*a11y-check','*calculate-roi'],tags:['UX Research','Design Tokens','Atomic Design','WCAG']},
+  {id:'squad-creator',name:'Craft',icon:'🏗️',color:'#64748b',role:'Squad Architect & Builder',archetype:'Builder ♑',desc:'Cria, valida e publica squads — pacotes de agentes/tasks para domínios específicos.',cmds:['*design-squad','*create-squad {name}','*validate-squad {name}','*list-squads','*analyze-squad {name}','*extend-squad {name}','*migrate-squad {path}'],tags:['Squads','Packages','Distribution']}
+];
+
+// ===== RENDER AGENTS =====
+const agentGrid=document.getElementById('agentGrid');
+agents.forEach(a=>{
+  const div=document.createElement('div');
+  div.className='card agent-card';
+  div.innerHTML=`
+    <div class="agent-header">
+      <div class="agent-icon" style="background:${a.color}22;border:1px solid ${a.color}44">${a.icon}</div>
+      <div class="agent-meta"><h3 style="color:${a.color}">${a.name}</h3><div class="agent-role">${a.role}</div></div>
+    </div>
+    <p>${a.desc}</p>
+    <div class="agent-tags">${a.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    <div class="agent-detail">
+      <p style="font-size:.75rem;color:var(--text-muted);margin-bottom:.5rem">Ativação: <code>@${a.id}</code> · Archetype: ${a.archetype}</p>
+      <ul class="cmd-list">${a.cmds.map(c=>{const[cmd,...rest]=c.split(' — ');return`<li><code>${cmd}</code>${rest.length?`<span class="cmd-desc">${rest.join(' — ')}</span>`:''}</li>`}).join('')}</ul>
+    </div>`;
+  div.addEventListener('click',()=>div.classList.toggle('expanded'));
+  agentGrid.appendChild(div);
+});
+
+// ===== COMMAND DATA =====
+const cmdData=[
+  {cat:'👑 Orion — Orchestration',cmds:[
+    ['*help','Lista todos os comandos do agente ativo'],
+    ['*status','Mostra contexto e progresso atual'],
+    ['*kb','Toggle Knowledge Base (carrega aiox-kb.md)'],
+    ['*guide','Guia completo de uso do agente'],
+    ['*yolo','Cicla modo de permissão: Ask → Auto → Explore'],
+    ['*exit','Sai do modo de agente atual'],
+    ['*agent {name}','Info sobre agente (use @ para ativar)'],
+    ['*chat-mode','Inicia assistência conversacional'],
+  ]},
+  {cat:'🏗️ Framework — Create & Modify',cmds:[
+    ['*create agent {name}','Cria nova definição de agente'],
+    ['*create task {name}','Cria novo arquivo de task'],
+    ['*create workflow {name}','Cria novo workflow YAML'],
+    ['*modify agent {name}','Modifica agente existente'],
+    ['*modify task {name}','Modifica task existente'],
+    ['*validate-component','Valida segurança e standards'],
+    ['*deprecate-component','Depreca com migration path'],
+    ['*propose-modification','Propõe modificações ao framework'],
+    ['*undo-last','Desfaz última modificação'],
+    ['*analyze-framework','Analisa estrutura e padrões'],
+    ['*list-components','Lista todos os componentes'],
+  ]},
+  {cat:'🔄 IDS — Incremental Decision System',cmds:[
+    ['*ids check {intent}','Pre-check: REUSE / ADAPT / CREATE'],
+    ['*ids impact {entity-id}','Análise de impacto (BFS consumers)'],
+    ['*ids register {file-path}','Registra entidade no registry'],
+    ['*ids health','Health check do registry'],
+    ['*ids stats','Estatísticas do registry'],
+    ['*sync-registry-intel','Enriquece registry com code intelligence'],
+  ]},
+  {cat:'📄 Documents & Planning',cmds:[
+    ['*create-doc {template}','Cria documento (PRD, arch, brief, etc)'],
+    ['*doc-out','Exporta documento completo'],
+    ['*shard-doc {doc} {dest}','Fragmenta documento para dev'],
+    ['*document-project','Gera documentação do projeto'],
+    ['*create-next-story','Cria próxima user story'],
+    ['*add-tech-doc {file}','Cria tech-preset de doc'],
+  ]},
+  {cat:'⚡ Task & Workflow Execution',cmds:[
+    ['*task {name}','Executa task específica'],
+    ['*workflow {name}','Inicia workflow (guided ou engine)'],
+    ['*plan [create|status|update]','Gerencia planos de workflow'],
+    ['*execute-checklist {name}','Executa checklist'],
+    ['*validate-workflow {name}','Valida estrutura YAML do workflow'],
+  ]},
+  {cat:'💻 Dev — Implementation',cmds:[
+    ['*develop {story-id}','Implementa story (interactive|yolo|preflight)'],
+    ['*develop-yolo {story-id}','Desenvolvimento autônomo'],
+    ['*build-autonomous {story-id}','Loop de build autônomo com retries'],
+    ['*build-resume {story-id}','Resume build do último checkpoint'],
+    ['*build {story-id}','Pipeline completo: worktree→plan→exec→verify→merge'],
+    ['*apply-qa-fixes','Aplica feedback do QA'],
+    ['*run-tests','Executa lint + todos os testes'],
+    ['*create-service','Gera novo service de template'],
+    ['*waves','Analisa oportunidades de paralelismo'],
+    ['*gotcha {title}','Registra gotcha manualmente'],
+    ['*explain','Explica em detalhes o que fez'],
+  ]},
+  {cat:'✅ QA — Quality',cmds:[
+    ['*review {story}','Review comprehensivo com gate decision'],
+    ['*review-build {story}','10 fases estruturadas (Epic 6)'],
+    ['*gate {story}','Cria decisão de quality gate'],
+    ['*code-review {scope}','Review automatizado (uncommitted|committed)'],
+    ['*security-check {story}','Scan de 8 pontos de segurança'],
+    ['*nfr-assess {story}','Valida requisitos não-funcionais'],
+    ['*risk-profile {story}','Gera matriz de risco'],
+    ['*test-design {story}','Cria cenários de teste'],
+    ['*trace {story}','Mapeia req→tests (Given-When-Then)'],
+    ['*validate-migrations','Valida migrações de DB'],
+  ]},
+  {cat:'⚡ DevOps — Deploy & Infra',cmds:[
+    ['*environment-bootstrap','Setup completo: CLIs, auth, Git, GitHub'],
+    ['*pre-push','Executa todos os quality gates'],
+    ['*push','Git push após gates passarem'],
+    ['*create-pr','Cria Pull Request'],
+    ['*release','Cria release versionada com changelog'],
+    ['*version-check','Analisa e recomenda próxima versão'],
+    ['*configure-ci','Setup GitHub Actions'],
+    ['*cleanup','Remove branches e files stale'],
+    ['*triage-issues','Analisa e prioriza GitHub issues'],
+    ['*resolve-issue {n}','Investiga e resolve issue end-to-end'],
+    ['*health-check','Diagnóstico de saúde (15 checks)'],
+    ['*setup-mcp-docker','Configura Docker MCP Toolkit'],
+    ['*add-mcp / *search-mcp','Adiciona/busca MCP servers'],
+  ]},
+  {cat:'📊 Data — Database',cmds:[
+    ['*create-schema','Design de schema de banco'],
+    ['*model-domain','Sessão de modelagem de domínio'],
+    ['*setup-database','Setup interativo (supabase, pg, etc)'],
+    ['*bootstrap','Scaffolda estrutura supabase/'],
+    ['*apply-migration {path}','Roda migração com snapshot safety'],
+    ['*dry-run {path}','Testa migração sem commitar'],
+    ['*snapshot {label}','Cria snapshot do schema'],
+    ['*rollback {snapshot}','Restaura snapshot'],
+    ['*security-audit {scope}','Audit de segurança (rls|schema|full)'],
+    ['*analyze-performance {type}','Análise de performance (query|hotpaths)'],
+    ['*test-as-user {id}','Emula usuário para testar RLS'],
+    ['*smoke-test {version}','Testes abrangentes do banco'],
+  ]}
+];
+
+// ===== RENDER COMMANDS =====
+function renderCmds(filter=''){
+  const container=document.getElementById('cmdList');
+  const f=filter.toLowerCase();
+  container.innerHTML=cmdData.map(cat=>{
+    const rows=cat.cmds.filter(c=>!f||c[0].toLowerCase().includes(f)||c[1].toLowerCase().includes(f));
+    if(!rows.length)return'';
+    return`<div class="cmd-category"><h4>${cat.cat}</h4>${rows.map(c=>`<div class="cmd-row"><code>${c[0]}</code><span class="exp">${c[1]}</span></div>`).join('')}</div>`;
+  }).join('');
+}
+renderCmds();
+document.getElementById('cmdFilter').addEventListener('input',e=>renderCmds(e.target.value));
+
+// ===== NAV ACTIVE STATE =====
+const sections=document.querySelectorAll('.section');
+const navLinks=document.querySelectorAll('.nav a');
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      const link=document.querySelector(`.nav a[href="#${e.target.id}"]`);
+      if(link)link.classList.add('active');
+    }
+  });
+},{threshold:0.3});
+sections.forEach(s=>observer.observe(s));
+</script>
+
+</body>
+</html>
