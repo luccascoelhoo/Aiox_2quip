@@ -27,6 +27,19 @@ interface AgentManifest {
   commands: string[];
 }
 
+interface StoryOverview {
+  id: string;
+  title: string;
+  status: 'PENDING' | 'IN_PROGRESS' | 'DONE';
+  criteriaCount: number;
+  doneCount: number;
+}
+
+interface StoryDetail extends StoryOverview {
+  content: string;
+  criteria: Array<{ text: string; done: boolean }>;
+}
+
 export class AIOXClient {
   private baseUrl: string;
 
@@ -44,6 +57,20 @@ export class AIOXClient {
     const res = await fetch(`${this.baseUrl}/api/agents`);
     if (!res.ok) throw new Error(`Agents fetch failed: ${res.status}`);
     return res.json();
+  }
+
+  async getStories(): Promise<StoryOverview[]> {
+    const response = await fetch(`${this.baseUrl}/api/stories`);
+    if (!response.ok) throw new Error('Failed to fetch stories from AIOX backend');
+    const data = await response.json();
+    return data.stories || [];
+  }
+
+  async getStoryDetail(id: string): Promise<StoryDetail> {
+    const response = await fetch(`${this.baseUrl}/api/stories/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch story detail from AIOX backend');
+    const data = await response.json();
+    return data.story;
   }
 
   async executeCommand(command: string, agentContext?: string): Promise<CommandResponse> {

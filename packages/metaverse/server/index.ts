@@ -3,6 +3,7 @@ import cors from '@fastify/cors';
 import { stateRoutes } from './routes/state';
 import { agentsRoutes } from './routes/agents';
 import { commandRoutes } from './routes/command';
+import { storiesRoutes } from './routes/stories';
 
 const server = Fastify({ logger: false });
 
@@ -12,6 +13,7 @@ async function start() {
   server.register(stateRoutes, { prefix: '/api' });
   server.register(agentsRoutes, { prefix: '/api' });
   server.register(commandRoutes, { prefix: '/api' });
+  server.register(storiesRoutes, { prefix: '/api' });
 
   server.get('/health', async () => ({ status: 'ok', service: '2quip-metaverse-api', timestamp: new Date().toISOString() }));
 

@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
 import { eventBus } from '../../../bridge/EventBus';
 import { useMetaverseStore } from '../../../bridge/store';
+import { XPBar } from '../XPBar/XPBar';
 
-export function StatusHUD() {
+export function StatusHUD({ onOpenBadges, onOpenMissions }: {
+  onOpenBadges: () => void;
+  onOpenMissions: () => void;
+}) {
   const [sector, setSector] = useState('Lobby');
   const [fps, setFps] = useState(0);
   const backendConnected = useMetaverseStore((s) => s.backendConnected);
@@ -74,7 +78,7 @@ export function StatusHUD() {
           }}>
             2QUIP METAVERSE
           </div>
-          <div style={{ fontSize: 9, color: '#484f58', fontFamily: 'JetBrains Mono, monospace' }}>v0.1.0 — The Hive</div>
+          <div style={{ fontSize: 9, color: '#484f58', fontFamily: 'JetBrains Mono, monospace' }}>v0.2.0 — The Hive</div>
         </div>
       </div>
 
@@ -107,6 +111,21 @@ export function StatusHUD() {
           color={backendConnected ? '#3fb950' : '#f85149'}
           dot={backendConnected ? 'online' : 'error'}
         />
+      </div>
+
+      {/* XP Bar */}
+      <XPBar />
+
+      {/* Quick actions */}
+      <div style={{
+        display: 'flex',
+        gap: 4,
+        marginTop: 8,
+        paddingTop: 8,
+        borderTop: '1px solid rgba(48, 54, 61, 0.4)',
+      }}>
+        <QuickButton icon="🏅" label="Badges" shortcut="B" onClick={onOpenBadges} />
+        <QuickButton icon="🎯" label="Missions" shortcut="M" onClick={onOpenMissions} />
       </div>
     </div>
   );
@@ -149,5 +168,40 @@ function StatusRow({ icon, label, value, color, extra, dot }: {
         {extra}
       </span>
     </div>
+  );
+}
+
+function QuickButton({ icon, label, shortcut, onClick }: {
+  icon: string;
+  label: string;
+  shortcut: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="hive-btn"
+      style={{
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 4,
+        padding: '5px 6px',
+        fontSize: 9,
+      }}
+    >
+      <span>{icon}</span>
+      <span>{label}</span>
+      <kbd style={{
+        fontSize: 7,
+        padding: '0 4px',
+        borderRadius: 3,
+        background: 'rgba(48, 54, 61, 0.5)',
+        color: '#484f58',
+        border: '1px solid rgba(48, 54, 61, 0.3)',
+        marginLeft: 2,
+      }}>{shortcut}</kbd>
+    </button>
   );
 }
